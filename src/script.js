@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import gsap from 'gsap';
 
 const scene = new THREE.Scene();
 
@@ -68,3 +69,34 @@ const renderer = new THREE.WebGLRenderer({
 renderer.setSize(sizes.width, sizes.height);
 
 renderer.render(scene, camera);
+
+
+const clock = new THREE.Clock();
+
+// let time = Date.now();
+
+gsap.to(cube3.position, { y: 2, duration: 1, delay: 1 });
+
+// Animations
+const tick = () => {
+    // using delta time animation
+    // const currentTime = Date.now();
+    // const deltaTime = currentTime - time;
+    // time = currentTime;
+
+    // internal clock animation
+    // const elapsedTime = clock.getElapsedTime();
+
+    // cube1.rotation.y = Math.sin(elapsedTime * Math.PI * 2);
+    // cube2.rotation.x += 0.01;
+
+    // cube1.position.y = Math.sin(elapsedTime);
+    // cube1.position.x = Math.cos(elapsedTime);
+    // camera.lookAt(cube1.position);
+
+    renderer.render(scene, camera);
+
+    window.requestAnimationFrame(tick);
+};
+
+tick();
