@@ -1,102 +1,81 @@
-import * as THREE from 'three';
-import gsap from 'gsap';
+import * as THREE from 'three'
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
-const scene = new THREE.Scene();
+/**
+ * Base
+ */
 
-// const geometry = new THREE.BoxGeometry(1, 1, 1);
-// const material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
-// const mesh = new THREE.Mesh(geometry, material);
-// // mesh.position.x = 0.7;
-// // mesh.position.y = -0.6;
-// // mesh.position.z = 1;
-// mesh.position.set(0.7, -0.6, 1);
-// mesh.scale.set(2, 0.5, 0.5);
-// mesh.rotation.reorder('YXZ');
-// mesh.rotation.set(Math.PI * .25, Math.PI / 2, 0);
-// scene.add(mesh);
+// Cursor
+const cursor = {
+    x: 0,
+    y: 0
+};
+window.addEventListener('mousemove', (e) => {
+    cursor.x = e.clientX / sizes.width -.5;
+    cursor.y = - (e.clientY / sizes.height -.5);
+});
 
-const group = new THREE.Group();
-scene.add(group);
+// Canvas
+const canvas = document.querySelector('canvas.webgl')
 
-const cube1 = new THREE.Mesh(
-    new THREE.BoxGeometry(1, 1, 1),
-    new THREE.MeshBasicMaterial({ color: 0xff0000 })
-);
-group.add(cube1);
-
-const cube2 = new THREE.Mesh(
-    new THREE.BoxGeometry(1, 1, 1),
-    new THREE.MeshBasicMaterial({ color: 0x00ff00 })
-);
-cube2.position.set(-2, 0, 0)
-group.add(cube2);
-
-const cube3 = new THREE.Mesh(
-    new THREE.BoxGeometry(1, 1, 1),
-    new THREE.MeshBasicMaterial({ color: 0x0000ff })
-);
-cube3.position.set(2, 0, 0)
-group.add(cube3);
-
-group.position.set(0, 1, 0);
-group.scale.set(1, 2, 1);
-group.rotation.set(0, 2, 0);
-
-const axisHelper = new THREE.AxesHelper();
-scene.add(axisHelper);
-
-// mesh.position.normalize();
-// console.log(mesh.position.length());
-
+// Sizes
 const sizes = {
     width: 800,
-    height: 600,
-};
+    height: 600
+}
 
+// Scene
+const scene = new THREE.Scene()
+
+// Object
+const mesh = new THREE.Mesh(
+    new THREE.BoxGeometry(1, 1, 1, 5, 5, 5),
+    new THREE.MeshBasicMaterial({ color: 0xff0000 })
+)
+scene.add(mesh)
+
+// Camera
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height);
-camera.position.z = 5;
-camera.position.x = -1;
-camera.position.y = 1;
-scene.add(camera);
+// const aspectRatio = sizes.width / sizes.height;
+// const camera = new THREE.OrthographicCamera(-1 * aspectRatio, 1 * aspectRatio, 1, -1, 0.1, 100);
 
-// camera.lookAt(mesh.position);
-// console.log(mesh.position.distanceTo(camera.position));
+// camera.position.x = 2
+// camera.position.y = 2
+camera.position.z = 2
+// camera.lookAt(mesh.position)
+scene.add(camera)
 
-const canvas = document.querySelector('.webgl');
+const controls = new OrbitControls(camera, canvas);
+controls.enableDamping = true;
+
+// Renderer
 const renderer = new THREE.WebGLRenderer({
-    canvas,
-});
-renderer.setSize(sizes.width, sizes.height);
+    canvas: canvas
+})
+renderer.setSize(sizes.width, sizes.height)
 
-renderer.render(scene, camera);
+// Animate
+const clock = new THREE.Clock()
 
+const tick = () =>
+{
+    // camera.position.x = Math.sin(cursor.x * Math.PI * 2) * Math.PI;
+    // camera.position.z = Math.cos(cursor.x * Math.PI * 2) * Math.PI;
+    // camera.position.y = cursor.y * 5;
+    // camera.lookAt(mesh.position);
 
-const clock = new THREE.Clock();
+    const elapsedTime = clock.getElapsedTime()
 
-// let time = Date.now();
+    // Update objects
+    // mesh.rotation.y = elapsedTime;
 
-gsap.to(cube3.position, { y: 2, duration: 1, delay: 1 });
+    controls.update();
 
-// Animations
-const tick = () => {
-    // using delta time animation
-    // const currentTime = Date.now();
-    // const deltaTime = currentTime - time;
-    // time = currentTime;
+    // Render
+    renderer.render(scene, camera)
 
-    // internal clock animation
-    // const elapsedTime = clock.getElapsedTime();
-
-    // cube1.rotation.y = Math.sin(elapsedTime * Math.PI * 2);
-    // cube2.rotation.x += 0.01;
-
-    // cube1.position.y = Math.sin(elapsedTime);
-    // cube1.position.x = Math.cos(elapsedTime);
-    // camera.lookAt(cube1.position);
-
-    renderer.render(scene, camera);
-
-    window.requestAnimationFrame(tick);
-};
+    // Call tick again on the next frame
+    window.requestAnimationFrame(tick)
+}
 
 tick();
