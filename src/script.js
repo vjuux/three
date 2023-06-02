@@ -1,16 +1,36 @@
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
-import gsap from 'gsap'
-import * as gui from 'lil-gui';
+// import imageSource from '../static/textures/door/color.jpg';
 
-// Debug
-const parameters = {
-    color: 0xff0000,
-    spin() {
-        gsap.to(mesh.rotation, { y: mesh.rotation.y + Math.PI, duration: 1 })
-    },
-}
-const g = new gui.GUI();
+// Textures
+const loadingManager = new THREE.LoadingManager();
+loadingManager.onStart = () => { console.log('start'); };
+loadingManager.onLoad = () => { console.log('load'); };
+loadingManager.onError = () => { console.log('error'); };
+const textureLoader = new THREE.TextureLoader(loadingManager);
+const colorTexture = textureLoader.load('/textures/door/color.jpg');
+const checkerboardTexture = textureLoader.load('/textures/checkerboard-1024x1024.png');
+const minecraftTexture = textureLoader.load('/textures/minecraft.png');
+const alphaTexture = textureLoader.load('/textures/door/alpha.jpg');
+const heightTexture = textureLoader.load('/textures/door/height.jpg');
+
+colorTexture.repeat.x = 2;
+colorTexture.repeat.y = 2;
+colorTexture.wrapS = THREE.RepeatWrapping;
+colorTexture.wrapT = THREE.RepeatWrapping;
+colorTexture.offset.x = 0.5;
+colorTexture.offset.y = 0.5;
+colorTexture.center.set(.5, .5)
+colorTexture.rotation = Math.PI * .25;
+// colorTexture.minFilter = THREE.NearestFilter;
+colorTexture.magFilter = THREE.NearestFilter;
+
+// const image = new Image();
+// const texture = new THREE.Texture(image);
+// image.onLoad = () => {
+//     texture.needsUpdate = true;
+// };
+// image.src = '/textures/door/color.jpg';
 
 /**
  * Base
@@ -25,20 +45,9 @@ const scene = new THREE.Scene()
  * Object
  */
 const geometry = new THREE.BoxGeometry(1, 1, 1)
-const material = new THREE.MeshBasicMaterial({ color: parameters.color, wireframe: true })
+const material = new THREE.MeshBasicMaterial({ map: colorTexture })
 const mesh = new THREE.Mesh(geometry, material)
 scene.add(mesh)
-
-// Debug
-g.add(mesh.position, 'y').min(-3).max(3).step(.01).name('elevation of the cube');
-g.add(mesh.position, 'x', -3, 3, .1);
-g.add(mesh.position, 'z', -3, 3, .1);
-g.add(mesh, 'visible');
-g.add(mesh.material, 'wireframe');
-g.addColor(parameters, 'color').onChange(() => {
-    material.color.set(parameters.color);
-})
-g.add(parameters, 'spin');
 
 /**
  * Sizes
@@ -68,7 +77,9 @@ window.addEventListener('resize', () =>
  */
 // Base camera
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
-camera.position.z = 3
+camera.position.x = 1
+camera.position.y = 1
+camera.position.z = 1
 scene.add(camera)
 
 // Controls
